@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import requestValidator from "../middlewares/requestValidator";
+import requestValidator from "../middlewares/requestValidator.js";
 
 const router = Router();
 

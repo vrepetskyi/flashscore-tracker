@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { env } from "../utils";
+import { env } from "../utils.js";
 
 const dailyRotateTransport = new DailyRotateFile({
   filename: "logs/requests-%DATE%.log",

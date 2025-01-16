@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { z, ZodError, ZodSchema } from "zod";
-import { AppError } from "./errorHandler";
+import { AppError } from "./errorHandler.js";
 
 const requestValidator =
   <B, Q>({

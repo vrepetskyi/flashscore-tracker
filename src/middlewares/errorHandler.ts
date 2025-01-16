@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { env, loggerFormat } from "../utils";
+import { env, loggerFormat } from "../utils.js";
 
 export class AppError extends Error {
   statusCode: number;

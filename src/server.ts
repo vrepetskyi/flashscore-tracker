@@ -1,11 +1,11 @@
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import errorHandler from "./middlewares/errorHandler";
-import requestLogger from "./middlewares/requestLogger";
-import routes from "./routes";
-import "./services/soccer/soccerScrapperService";
-import { env } from "./utils";
+import errorHandler from "./middlewares/errorHandler.js";
+import requestLogger from "./middlewares/requestLogger.js";
+import routes from "./routes/index.js";
+import "./services/soccer/soccerScrapperService.js";
+import { env } from "./utils.js";
 
 const app = express();
 
