@@ -4,11 +4,13 @@ import helmet from "helmet";
 import errorHandler from "./middlewares/errorHandler.js";
 import requestLogger from "./middlewares/requestLogger.js";
 import routes from "./routes/index.js";
+// Scrapper is being scheduled inside of respective service.
 import "./services/soccer/soccerScrapperService.js";
 import { env } from "./utils.js";
 
 const app = express();
 
+// Secured the server from unwanted requests.
 app.use(helmet());
 app.use(cors({ origin: false }));
 
@@ -16,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(requestLogger);
+// Prepared the endpoint architecture for versioning.
 app.use("/api/v1", routes);
 app.use(errorHandler);
 

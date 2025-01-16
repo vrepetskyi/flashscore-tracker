@@ -3,6 +3,8 @@ import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import { env, loggerFormat } from "../utils.js";
 
+// Implemented AppError class to handle the errors in a centralized way.
+
 export class AppError extends Error {
   statusCode: number;
   details?: any;

@@ -1,3 +1,5 @@
+# For safety, the databases are not exposed to local machine, only to the container group.
+
 services:
   postgres:
     image: postgres:17

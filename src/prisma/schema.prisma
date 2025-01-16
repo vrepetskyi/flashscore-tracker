@@ -1,14 +1,41 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+// From my experience, it is better not to normalize the database too early.
+// When a project is fresh, many requirements may change in the process.
+// Premature optimization in form of database normalization is a complication in such cases.
+
+model Match {
+  matchId String @id
+  league  String
+  host    String
+  guest   String
+
+  oddSets OddsSet[]
+
+  @@index([league])
+}
+
+model OddsSet {
+  rateSetId  Int      @id @default(autoincrement())
+  bookmaker  String
+  oddsHome   Float
+  oddsDraw   Float
+  oddsGuest  Float
+  insertDate DateTime @default(now())
+
+  matchId String
+  match   Match  @relation(fields: [matchId], references: [matchId])
+
+  // While scrapping the data, I have noticed that the odds also depend on location of the user.
+  // Comparison of odds for various regions may be added in the future as an additional feature.
+
+  // geoCode            String 
+  // geoSubdivisionCode String
 }

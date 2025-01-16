@@ -3,6 +3,8 @@ import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import { env } from "../utils.js";
 
+// The logs are splitted by day and are kept for two weeks.
+
 const dailyRotateTransport = new DailyRotateFile({
   filename: "logs/requests-%DATE%.log",
   datePattern: "YYYY-MM-DD",

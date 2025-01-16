@@ -4,6 +4,9 @@ import requestValidator from "../middlewares/requestValidator.js";
 
 const router = Router();
 
+// I have assumed that the leagues are not known beforehand and are determined during the scrapping phase.
+// Therefore, a lookup is available and no strict validation is imposed on respective parameter in matches endpoint.
+
 router.get("/leagues", () => {});
 
 router.post("/matches", () => {});
