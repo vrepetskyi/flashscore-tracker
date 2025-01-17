@@ -1,11 +1,11 @@
 import { PuppeteerBlocker } from "@ghostery/adblocker-puppeteer";
-import { PrismaClient } from "@prisma/client";
 import * as Sentry from "@sentry/node";
 import fetch from "cross-fetch";
 import { parse } from "date-fns";
 import cron from "node-cron";
 import puppeteer, { Browser } from "puppeteer";
 import { z } from "zod";
+import prisma from "../../prisma/client.js";
 import { env, logger } from "../../utils.js";
 
 // For scraping a tool like Puppetter was the only option, because the rendering on Flashscore is done by JS and there are no fetch requests being sent.
@@ -152,14 +152,13 @@ type Matches = Awaited<ReturnType<typeof scrapeMatch>>[];
 // Perform upsert in case some details of the match e.g. date have changed.
 
 const upsertMatches = async (matches: Matches) => {
-  const prisma = new PrismaClient();
-
   const operations = [
     prisma.match.updateMany({ data: { isUpToDate: false } }),
 
     ...matches.map(({ matchId, oddsSets, scrapeAt, ...rest }) =>
       prisma.match.upsert({
         where: { matchId },
+
         update: {
           ...rest,
           lastScrapeAt: scrapeAt,
@@ -168,6 +167,7 @@ const upsertMatches = async (matches: Matches) => {
           },
           isUpToDate: true,
         },
+
         create: {
           matchId,
           ...rest,
@@ -182,8 +182,6 @@ const upsertMatches = async (matches: Matches) => {
   ];
 
   await prisma.$transaction(operations);
-
-  await prisma.$disconnect();
 };
 
 const scrapeFreshData = async () => {
@@ -228,12 +226,17 @@ const scrapeFreshData = async () => {
   await Promise.all(queue);
   logger.info("2/3 Matches scraped.");
 
+  await browser.close();
+
   // Upsert all the matches in one DB request.
   logger.info("3/3 Upserting matches...");
   await upsertMatches(matches);
   logger.info("3/3 Matches upserted.");
 
-  await browser.close();
+  // Optionally cleanup matches that have already started.
+  if (env.SCRAPING_CLEANUP_STARTED === "true") {
+    prisma.match.deleteMany({ where: { date: { lt: new Date() } } });
+  }
 };
 
 const runScrapeTask = async () => {
@@ -247,6 +250,8 @@ const runScrapeTask = async () => {
 
 // Run scraping without blocking the main thread.
 (async function initializeScraping() {
-  await runScrapeTask();
+  if (env.SCRAPING_ON_START === "true") {
+    await runScrapeTask();
+  }
   cron.schedule(`*/${env.SCRAPING_INTERVAL_MINUTES} * * * *`, runScrapeTask);
 })();

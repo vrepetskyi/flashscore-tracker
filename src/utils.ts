@@ -14,17 +14,18 @@ declare global {
       POSTGRES_PASSWORD: string;
       POSTGRES_URL: string;
 
+      SCRAPING_ON_START: "true" | "false";
+      SCRAPING_MAX_TABS: string;
+      SCRAPING_CLEANUP_STARTED: "true" | "false";
+      SCRAPING_INTERVAL_MINUTES: string;
+
       REDIS_PASSWORD: string;
       REDIS_URL: string;
 
+      REDIS_CACHE_MINUTES: string;
+      BROWSER_CACHE_MINUTES: string;
+
       KEEP_LOGS_DAYS: string;
-      SCRAPING_INTERVAL_MINUTES: string;
-      REDIS_CACHE_MINUTE: string;
-      BROWSER_CACHE_MINUTE: string;
-
-      SCRAPING_MAX_TABS: string;
-      CLEANUP_STARTED_MATCHES: "true" | "false";
-
       SENTRY_DSN: string;
     }
   }
