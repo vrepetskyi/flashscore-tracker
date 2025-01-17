@@ -1,7 +1,6 @@
+import * as Sentry from "@sentry/node";
 import { NextFunction, Request, Response } from "express";
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
-import { env, loggerFormat } from "../utils.js";
+import { logger } from "../utils.js";
 
 // Implemented AppError class to handle the errors in a centralized way.
 
@@ -29,20 +28,6 @@ export class AppError extends Error {
   }
 }
 
-const logger = winston.createLogger({
-  format: loggerFormat,
-  transports: [
-    new DailyRotateFile({
-      filename: "logs/errors-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
-      maxFiles: env.KEEP_LOGS_DAYS,
-    }),
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    }),
-  ],
-});
-
 const errorHandler = (
   err: any,
   _1: Request,
@@ -60,6 +45,7 @@ const errorHandler = (
   }
 
   logger.error(`${err?.message}: ${err?.stack}`);
+  Sentry.captureException(err);
 
   if (err instanceof AppError) {
     return;

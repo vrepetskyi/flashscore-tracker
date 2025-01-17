@@ -4,9 +4,12 @@ import helmet from "helmet";
 import errorHandler from "./middlewares/errorHandler.js";
 import requestLogger from "./middlewares/requestLogger.js";
 import routes from "./routes/index.js";
-// Scrapper is being scheduled inside of respective service.
-import "./services/soccer/soccerScrapperService.js";
+// Scraper is being scheduled inside of respective service.
+import * as Sentry from "@sentry/node";
+import "./services/soccer/soccerScraperService.js";
 import { env } from "./utils.js";
+
+Sentry.init({ dsn: env.SENTRY_DSN });
 
 const app = express();
 

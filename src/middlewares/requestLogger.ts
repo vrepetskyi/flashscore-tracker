@@ -1,24 +1,19 @@
 import { NextFunction, Request, Response } from "express";
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { env } from "../utils.js";
+import { env, loggerFormat } from "../utils.js";
 
 // The logs are splitted by day and are kept for two weeks.
 
-const dailyRotateTransport = new DailyRotateFile({
-  filename: "logs/requests-%DATE%.log",
-  datePattern: "YYYY-MM-DD",
-  maxFiles: env.KEEP_LOGS_DAYS,
-});
-
-const { combine, timestamp, printf } = winston.format;
-
-const logger = winston.createLogger({
-  format: combine(
-    timestamp(),
-    printf(({ timestamp, message }) => `${timestamp} ${message}`)
-  ),
-  transports: [dailyRotateTransport],
+export const logger = winston.createLogger({
+  format: loggerFormat,
+  transports: [
+    new DailyRotateFile({
+      filename: "logs/requests-%DATE%.log",
+      datePattern: "YYYY-MM-DD",
+      maxFiles: env.KEEP_LOGS_DAYS,
+    }),
+  ],
 });
 
 if (env.NODE_ENV === "development") {
@@ -38,7 +33,7 @@ const requestLogger = (req: Request, res: Response, next: NextFunction) => {
     headers,
   };
 
-  logger.info(`Request: ${JSON.stringify(logMessage, null, 2)}`);
+  logger.info(`Incoming request: ${JSON.stringify(logMessage, null, 2)}`);
 
   next();
 };

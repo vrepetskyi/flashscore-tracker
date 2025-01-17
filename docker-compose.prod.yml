@@ -28,6 +28,7 @@ services:
       - .env
     environment:
       - NODE_ENV=production
+      - POSTGRES_URL=postgresql://postgres:${POSTGRES_PASSWORD}@localhost:5432/postgres
     ports:
       - ${PORT}:${PORT}
     depends_on:
