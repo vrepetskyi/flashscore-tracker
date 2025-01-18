@@ -34,3 +34,15 @@ Body of the coupon request should be like that:
   ]
 }
 ```
+
+## Development Setup
+
+If you would like to go a bit deeper and see more debug messages, start the application in development mode:
+
+- Copy .env.example and rename it to .env
+- Set NODE_ENV=development
+- Set domain part of POSTGRES_URL and REDIS_URL to localhost (localhost:5432 and localhost:6379)
+- [ATTENTION!] you may need to adjust launch arguments for Puppeteer (src/services/soccer/soccerScraperService.ts)
+- Run `docker compose up -d`
+- Run `npm i -f`
+- Run `npm run dev`
