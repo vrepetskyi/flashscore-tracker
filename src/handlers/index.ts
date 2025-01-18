@@ -1,5 +1,5 @@
 import { Router } from "express";
-import soccerHandlers from "./soccerHandlers.js";
+import soccerHandlers from "./soccerHandlers";
 
 const router = Router();
 

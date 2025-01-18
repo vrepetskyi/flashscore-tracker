@@ -1,5 +1,5 @@
-import prisma from "../../prisma/client.js";
-import { groupBy } from "../../utils.js";
+import prisma from "../../prisma/client";
+import { groupBy } from "../../utils";
 
 export const getLeagues = async () => {
   const entries = await prisma.match.groupBy({

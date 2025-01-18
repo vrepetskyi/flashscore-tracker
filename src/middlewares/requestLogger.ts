@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { env, loggerFormat } from "../utils.js";
+import { env, loggerFormat } from "../utils";
 
 // The logs are splitted by day and are kept for two weeks.
 

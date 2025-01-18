@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { NextFunction, Request, Response } from "express";
-import { logger } from "../utils.js";
+import { logger } from "../utils";
 
 // Implemented AppError class to handle the errors in a centralized way.
 

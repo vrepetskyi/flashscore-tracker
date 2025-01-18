@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/node";
 import { RequestHandler, Response } from "express";
 import { Redis } from "ioredis";
-import { env, logger } from "../utils.js";
+import { env, logger } from "../utils";
 
 const redis = new Redis(env.REDIS_URL);
 
@@ -29,12 +29,7 @@ const cacheMiddleware = (): RequestHandler => async (req, res, next) => {
 
   res.send = (body: any): Response => {
     try {
-      redis.set(
-        key,
-        JSON.stringify(body),
-        "EX",
-        Number(env.REDIS_CACHE_MINUTES) * 60
-      );
+      redis.set(key, body, "EX", Number(env.REDIS_CACHE_MINUTES) * 60);
     } catch (err) {
       logger.error(`Redis set error for ${key}:`, err);
       Sentry.captureException(err);

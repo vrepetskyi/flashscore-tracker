@@ -1,17 +1,16 @@
 import { Router } from "express";
 import { z } from "zod";
-import cacheMiddleware from "../middlewares/cacheMiddleware.js";
-import requestValidator from "../middlewares/requestValidator.js";
+import cacheMiddleware from "../middlewares/cacheMiddleware";
+import requestValidator from "../middlewares/requestValidator";
 import {
   couponSchema,
   getCouponOddsByBookmaker,
-} from "../services/soccer/soccerCouponsService.js";
+} from "../services/soccer/soccerCouponsService";
 import {
   getLeagues,
   getUpcoming,
   isLeagueValid,
-} from "../services/soccer/soccerMatchesService.js";
-import { env } from "../utils.js";
+} from "../services/soccer/soccerMatchesService";
 
 const router = Router();
 
@@ -24,10 +23,6 @@ router.get(
   requestValidator(),
   async (_, res, next) => {
     try {
-      res.set(
-        "Cache-Control",
-        `public, max-age=${Number(env.BROWSER_CACHE_MINUTES) * 60}`
-      );
       res.json(await getLeagues());
     } catch (err) {
       next(err);
@@ -51,10 +46,6 @@ router.get(
   }),
   async (req, res, next) => {
     try {
-      res.set(
-        "Cache-Control",
-        `public, max-age=${Number(env.BROWSER_CACHE_MINUTES) * 60}`
-      );
       res.json(await getUpcoming(req.query.league));
     } catch (err) {
       next(err);
@@ -72,10 +63,6 @@ router.post(
   }),
   async (req, res, next) => {
     try {
-      res.set(
-        "Cache-Control",
-        `public, max-age=${Number(env.BROWSER_CACHE_MINUTES) * 60}`
-      );
       res.json(await getCouponOddsByBookmaker(req.body.coupon));
     } catch (err) {
       next(err);

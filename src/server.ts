@@ -2,13 +2,13 @@ import * as Sentry from "@sentry/node";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import routes from "./handlers/index.js";
-import errorHandler from "./middlewares/errorHandler.js";
-import requestLogger from "./middlewares/requestLogger.js";
-import { env } from "./utils.js";
+import routes from "./handlers/index";
+import errorHandler from "./middlewares/errorHandler";
+import requestLogger from "./middlewares/requestLogger";
+import { env } from "./utils";
 
 // Scraper is being scheduled inside of respective service.
-import "./services/soccer/soccerScraperService.js";
+import "./services/soccer/soccerScraperService";
 
 Sentry.init({ dsn: env.SENTRY_DSN });
 

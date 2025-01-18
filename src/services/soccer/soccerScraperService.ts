@@ -5,8 +5,8 @@ import { parse } from "date-fns";
 import cron from "node-cron";
 import puppeteer, { Browser } from "puppeteer";
 import { z } from "zod";
-import prisma from "../../prisma/client.js";
-import { env, logger } from "../../utils.js";
+import prisma from "../../prisma/client";
+import { env, logger } from "../../utils";
 
 // For scraping a tool like Puppetter was the only option, because the rendering on Flashscore is done by JS and there are no fetch requests being sent.
 // There was also an exposed GraphQL endpoint for odds, but I have decided not to use it, because it didn't provide complete information about the match.
@@ -77,7 +77,7 @@ const scrapeUpcomingMatchIds = async (browser: Browser, blocker: any) => {
 
 const matchScraperSchema = z.object({
   matchId: z.string(),
-  date: z.date(),
+  date: z.date().min(new Date()),
   league: z.string(),
   home: z.string(),
   guest: z.string(),

@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { z, ZodError, ZodSchema } from "zod";
-import { AppError } from "./errorHandler.js";
+import { AppError } from "./errorHandler";
 
 // Implemented a custom validation middleware with Zod.
 // It generates exhaustive error messages and provides type declarations in the endpoint handlers.

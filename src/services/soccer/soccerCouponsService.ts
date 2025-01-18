@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { AppError } from "../../middlewares/errorHandler.js";
-import prisma from "../../prisma/client.js";
-import { groupBy } from "../../utils.js";
+import { AppError } from "../../middlewares/errorHandler";
+import prisma from "../../prisma/client";
+import { groupBy } from "../../utils";
 
-const isMatchesValid = async (matchIds: string[]) => {
+export const isMatchesValid = async (matchIds: string[]) => {
   const entries = await prisma.match.findMany({
     where: {
       matchId: { in: matchIds },
@@ -34,7 +34,7 @@ export const couponSchema = z
 /**
  * @returns the latests odds sets from bookmakers that are common for all of the matches grouped by the bookmaker and matchId.
  */
-const getOddsByBookmakerMatch = async (matchIds: string[]) => {
+export const getOddsByBookmakerMatch = async (matchIds: string[]) => {
   const groups = await prisma.oddsSet.groupBy({
     by: ["matchId", "bookmaker"],
     where: { matchId: { in: matchIds } },
