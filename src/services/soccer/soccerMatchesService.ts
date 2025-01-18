@@ -1,4 +1,5 @@
 import prisma from "../../prisma/client.js";
+import { groupBy } from "../../utils.js";
 
 export const getLeagues = async () => {
   const entries = await prisma.match.groupBy({
@@ -12,13 +13,15 @@ export const isLeagueValid = async (league: string) => {
   if (league.trim() === "") {
     return false;
   }
-  const count = await prisma.match.count({ where: { league } });
+  const count = await prisma.match.count({
+    where: { league, date: { gte: new Date() } },
+  });
   return count > 0;
 };
 
 export const getUpcoming = async (league?: string) => {
   const matches = await prisma.match.findMany({
-    where: { date: { gte: new Date() } },
+    where: { league, date: { gte: new Date() } },
     include: {
       oddsSets: {
         select: {
@@ -28,7 +31,7 @@ export const getUpcoming = async (league?: string) => {
           oddsGuest: true,
           scrapeAt: true,
         },
-        orderBy: { scrapeAt: "asc" },
+        orderBy: [{ bookmaker: "asc" }, { scrapeAt: "asc" }],
       },
     },
     orderBy: { date: "asc" },
@@ -36,16 +39,7 @@ export const getUpcoming = async (league?: string) => {
 
   const withAggregatedBookmakers = matches.map(({ oddsSets, ...match }) => ({
     ...match,
-    oddsHistoryByBookmaker: oddsSets.reduce(
-      (acc, { bookmaker, ...oddsSet }) => {
-        if (!(bookmaker in acc)) {
-          acc[bookmaker] = [];
-        }
-        acc[bookmaker].push(oddsSet);
-        return acc;
-      },
-      {} as Record<string, any[]>
-    ),
+    oddsHistoryByBookmaker: groupBy(oddsSets, "bookmaker"),
   }));
 
   return withAggregatedBookmakers;

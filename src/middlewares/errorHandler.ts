@@ -9,22 +9,12 @@ export class AppError extends Error {
   details?: any;
   critical?: boolean;
 
-  constructor(
-    statusCode: number,
-    message: string,
-    details?: any,
-    critical?: boolean
-  ) {
+  constructor(statusCode: number, message: string, details?: any) {
     super(message);
     Object.setPrototypeOf(this, new.target.prototype);
 
     this.statusCode = statusCode;
     this.details = details;
-    this.critical = critical;
-
-    if (critical && Error.captureStackTrace) {
-      Error.captureStackTrace(this, AppError);
-    }
   }
 }
 
@@ -34,22 +24,18 @@ const errorHandler = (
   res: Response,
   _2: NextFunction
 ) => {
+  if (err instanceof SyntaxError && err.message.includes("JSON")) {
+    err = new AppError(400, "Invalid JSON payload");
+  }
+
   if (err instanceof AppError) {
-    const { statusCode, message, details, critical } = err;
-
+    const { statusCode, message, details } = err;
     res.status(statusCode).json({ statusCode, message, details });
-
-    if (!critical) {
-      return;
-    }
+    return;
   }
 
   logger.error(`${err?.message}: ${err?.stack}`);
   Sentry.captureException(err);
-
-  if (err instanceof AppError) {
-    return;
-  }
 
   res.status(500).json({
     statusCode: 500,

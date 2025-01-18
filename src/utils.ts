@@ -56,3 +56,13 @@ export const logger = winston.createLogger({
     }),
   ],
 });
+
+export const groupBy = <T extends { [key: string]: any }, K extends keyof T>(
+  entries: T[],
+  key: K
+) =>
+  entries.reduce<Record<string, Omit<T, K>[]>>((acc, { [key]: k, ...rest }) => {
+    acc[k] ??= [];
+    acc[k].push(rest);
+    return acc;
+  }, {});

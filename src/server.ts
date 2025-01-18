@@ -18,7 +18,7 @@ const app = express();
 app.use(helmet());
 app.use(cors({ origin: false }));
 
-app.use(express.json());
+app.use(express.json({ strict: true }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(requestLogger);

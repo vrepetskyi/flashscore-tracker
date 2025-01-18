@@ -40,4 +40,6 @@ model OddsSet {
 
   // geoCode            String 
   // geoSubdivisionCode String
+
+  @@index([bookmaker])
 }

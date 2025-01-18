@@ -14,7 +14,9 @@ import { env, logger } from "../../utils.js";
 
 // In addition, I have used an ad blocker and handled cookies notifications to make the scraping more robust.
 // Currently, for time efficiency all the matches are being scraped in parallel with a limit of tabs.
-// Thanks to that the scraping is quite fast, but in case the process was to be longer, a more advanced ETL tool like Apache Spark would be useful.
+
+// Depending on the time of the day and the number of upcoming matches scraping takes up to 10 minutes,
+// but in case the process was to be longer, a more advanced ETL tool like Apache Spark would be useful.
 
 // In order to avoid the IP address of our main server being blocked by Flashscore, we may want to:
 // 1. Add a small random delay after each request
@@ -24,9 +26,17 @@ const MATCH_LIST_TIMEOUT = 3 * 1000;
 
 const browserConfiguration = {
   headless: true,
-  ...(env.NODE_ENV === "development" && {
-    executablePath: "/usr/bin/chromium-browser", // Needed for WSL
-  }),
+  ...(env.NODE_ENV === "development"
+    ? {
+        // Needed for WSL
+        executablePath: "/usr/bin/chromium-browser",
+      }
+    : {
+        headless: true,
+        defaultViewport: null,
+        executablePath: "/usr/bin/google-chrome",
+        args: ["--no-sandbox"],
+      }),
 };
 
 const scrapeUpcomingMatchIds = async (browser: Browser, blocker: any) => {
@@ -65,20 +75,22 @@ const scrapeUpcomingMatchIds = async (browser: Browser, blocker: any) => {
   return matchIds;
 };
 
-const OddsSetSchema = z.object({
-  bookmaker: z.string(),
-  oddsHome: z.number(),
-  oddsDraw: z.number(),
-  oddsGuest: z.number(),
-});
-
-const MatchSchema = z.object({
+const matchScraperSchema = z.object({
   matchId: z.string(),
   date: z.date(),
   league: z.string(),
   home: z.string(),
   guest: z.string(),
-  oddsSets: z.array(OddsSetSchema),
+  oddsSets: z
+    .array(
+      z.object({
+        bookmaker: z.string(),
+        oddsHome: z.number(),
+        oddsDraw: z.number(),
+        oddsGuest: z.number(),
+      })
+    )
+    .nonempty(),
   scrapeAt: z.date(),
 });
 
@@ -144,7 +156,7 @@ const scrapeMatch = async (browser: Browser, blocker: any, matchId: string) => {
     scrapeAt,
   };
 
-  return MatchSchema.parse(match);
+  return matchScraperSchema.parse(match);
 };
 
 type Matches = Awaited<ReturnType<typeof scrapeMatch>>[];
@@ -206,7 +218,7 @@ const scrapeFreshData = async () => {
         matches.push(match);
       })
       .catch((err) => {
-        logger.error(err);
+        logger.debug(err);
       })
       .finally(() => {
         // Free space in the queue after completion.
@@ -235,7 +247,7 @@ const scrapeFreshData = async () => {
 
   // Optionally cleanup matches that have already started.
   if (env.SCRAPING_CLEANUP_STARTED === "true") {
-    prisma.match.deleteMany({ where: { date: { lt: new Date() } } });
+    await prisma.match.deleteMany({ where: { date: { lt: new Date() } } });
   }
 };
 

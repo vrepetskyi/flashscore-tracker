@@ -24,11 +24,8 @@ services:
     build:
       context: .
       dockerfile: express.Dockerfile
-    env_file:
-      - .env
     environment:
-      - NODE_ENV=production
-      - POSTGRES_URL=postgresql://postgres:${POSTGRES_PASSWORD}@localhost:5432/postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - ${PORT}:${PORT}
     depends_on:
