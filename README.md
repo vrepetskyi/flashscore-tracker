@@ -45,4 +45,5 @@ If you would like to go a bit deeper and see more debug messages, start the appl
 - [ATTENTION!] you may need to adjust launch arguments for Puppeteer (src/services/soccer/soccerScraperService.ts)
 - Run `docker compose up -d`
 - Run `npm i -f`
+- Run `npx prisma db push`
 - Run `npm run dev`
